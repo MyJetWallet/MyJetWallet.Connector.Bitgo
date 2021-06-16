@@ -128,6 +128,18 @@ namespace MyJetWallet.Connector.Bitgo.Rest
             };
         }
 
+        public async Task<BitgoResult<DataList<Order>>> GetOrderByExternalId(string accountId, string externalId)
+        {
+            var apiPath = $"api/prime/trading/v1/accounts/{accountId}/orders?clientOrderId={externalId}";
+            var result = await CallAsync(HttpMethod.Get, apiPath);
+            return new BitgoResult<DataList<Order>>()
+            {
+                Success = result.Success,
+                Result = result.Success ? JsonSerializer.Deserialize<DataList<Order>>(result.body) : null,
+                Error = result.Success ? null : JsonSerializer.Deserialize<BitgoError>(result.body)
+            };
+        }
+
         public async Task<BitgoResult<Order>> GetOrder(string accountId, string orderId)
         {
             var apiPath = $"api/prime/trading/v1/accounts/{accountId}/orders/{orderId}";
