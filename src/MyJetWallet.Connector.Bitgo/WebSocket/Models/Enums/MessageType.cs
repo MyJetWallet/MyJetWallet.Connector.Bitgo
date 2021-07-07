@@ -6,6 +6,7 @@ namespace MyJetWallet.Connector.Bitgo.WebSocket.Models.Enums
     public enum MessageType
     {
         subscribe,
+        unsubscribe,
         snapshot,
         error
     }

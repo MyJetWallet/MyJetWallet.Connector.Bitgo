@@ -23,5 +23,16 @@ namespace MyJetWallet.Connector.Bitgo.WebSocket
             await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(msg)), WebSocketMessageType.Text,
                 true, CancellationToken.None);
         }
+        public static async Task UnsubscribeBitgoChannel(this ClientWebSocket webSocket, string accountId, string channel,
+            string productId)
+        {
+            var msg = JsonSerializer.Serialize(new
+            {
+                type = MessageType.unsubscribe.ToString(), accountId = accountId, channel = channel, productId = productId
+            });
+
+            await webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(msg)), WebSocketMessageType.Text,
+                true, CancellationToken.None);
+        }
     }
 }

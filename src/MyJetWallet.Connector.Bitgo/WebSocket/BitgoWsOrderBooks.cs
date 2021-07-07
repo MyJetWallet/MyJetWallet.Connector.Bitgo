@@ -16,7 +16,7 @@ namespace MyJetWallet.Connector.Bitgo.WebSocket
     public class BitgoWsOrderBooks : IDisposable
     {
         private readonly ILogger<BitgoWsOrderBooks> _logger;
-        private WebsocketEngine _engine;
+        private BitgoWebsocketEngine _engine;
 
         public static string Url { get; set; } = "wss://app.bitgo-test.com/api/prime/trading/v1/ws";
 
@@ -30,7 +30,7 @@ namespace MyJetWallet.Connector.Bitgo.WebSocket
             IReadOnlyCollection<string> marketList)
         {
             _logger = logger;
-            _engine = new WebsocketEngine(nameof(BitgoWsOrderBooks), Url, authToken, 5000, 10000, logger)
+            _engine = new BitgoWebsocketEngine(nameof(BitgoWsOrderBooks), Url, authToken, 5000, 10000, logger)
             {
                 OnReceive = Receive, OnConnect = Connect
             };
@@ -83,7 +83,26 @@ namespace MyJetWallet.Connector.Bitgo.WebSocket
             if (webSocket == null)
                 return;
 
+            await webSocket.UnsubscribeBitgoChannel(_account, Channel.level2.ToString(), market);
             await webSocket.SubscribeBitgoChannel(_account, Channel.level2.ToString(), market);
+        }
+
+        public async Task Subscribe(string market)
+        {
+            var webSocket = _engine.GetClientWebSocket();
+            if (webSocket == null)
+                return;
+
+            await webSocket.SubscribeBitgoChannel(_account, Channel.level2.ToString(), market);
+        }
+
+        public async Task Unsubscribe(string market)
+        {
+            var webSocket = _engine.GetClientWebSocket();
+            if (webSocket == null)
+                return;
+
+            await webSocket.UnsubscribeBitgoChannel(_account, Channel.level2.ToString(), market);
         }
 
         private async Task Connect(ClientWebSocket webSocket)
